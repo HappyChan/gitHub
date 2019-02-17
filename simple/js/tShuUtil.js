@@ -3,7 +3,45 @@ if( typeof tShu_util === 'undefined' ){
 }
 (function(tShu_util,$){
 	/*
-	    功能说明：异步加载资源文件
+	    功能说明：基于JQ的promise实现异步加载js,css文件
+		用法说明:
+		1、可同时将js，css设置为一个某个数组。然后需要加载时，直接加载。
+		//example_1
+		//先建立键值的映射，将js和css对应一个key
+		tShu_util.Res.setGroup({
+			foo: {
+				js: "js/fool.src.js",
+				css: "css/fool.src.css"
+			}
+		});
+		//加载资源组。此时需等到资源加载完毕，才触发回调
+		//type和msg是返回的错误信息
+		tShu_util.Res.loadg('foo').then(function(){
+			......
+		}).reject(function(type,msg){
+			
+		});
+		2、第二种做法不load数组，需要load的时候，同时建立映射
+		//example_2
+		tShu_util.Res.loadUrl("foo","js/fool.src.js").then(function(){
+			
+		}).reject(function(type,msg){
+			
+		});
+		3、第三种做法，不load数组，不建立映射。直接load了资源就算
+		tShu_util.Res.loadUrl("js/fool.src.js").then(function(){
+			
+		}).reject(function(type,msg){
+			
+		});
+		4、第四，直接load前面已经设置好的映射。但只能load单个文件
+		tShu_util.Res.load('foo').then(function(){
+			
+		}).reject(function(type,msg){
+			
+		});
+		特别注意：
+			此处返回的promise是jQ对象的promise。而不是原生的promise。不能直接用于组件懒加载
 	*/
 	tShu_util.Res = (function(){
 		var IS_CSS_RE = /\.css(?:\?|$)/i,
@@ -13,7 +51,7 @@ if( typeof tShu_util === 'undefined' ){
 			head = doc.head || doc.getElementsByTagName('head')[0] || doc.documentElement,
 			getErrDeferred = function(type, msg){
 				console.warn('Res_' + type, msg);
-				return Promise.reject(type, msg);
+				return $.Deferred().reject(type, msg);
 			},
 			setConf = function(key, val){
 				$.extend(Res.conf[key] || (Res.conf[key] = {}), $.type(val) == 'string' ? {val: val} : val);
@@ -26,6 +64,7 @@ if( typeof tShu_util === 'undefined' ){
 					$.each(confData, setConf);
 					return this;
 				},
+				//设置资源组
 				setGroup: function(groupData){
 					$.each(groupData, function(gkey, val){
 						if($.isArray(val)){
@@ -56,6 +95,7 @@ if( typeof tShu_util === 'undefined' ){
 					});
 					return this;
 				},
+				//检查是否已经加载完毕
 				checkLoad: function(prefix, id, cb){
 					var key = prefix + '_' + id;
 					var promise = this.cache[key];
@@ -70,6 +110,7 @@ if( typeof tShu_util === 'undefined' ){
 					}
 					return promise;
 				},
+				//加载资源组
 				loadg: function(groupName){
 					var group = this.groups[groupName]; 
 					if(!group)return getErrDeferred('empty', 'loadg:' + groupName);
@@ -77,6 +118,7 @@ if( typeof tShu_util === 'undefined' ){
 						return Res.load(group);
 					});
 				},
+				//加载资源
 				loadUrl: function(id, url){
 					url = url || id;
 					var data = Res.conf[id];
@@ -89,6 +131,7 @@ if( typeof tShu_util === 'undefined' ){
 					}
 					return this.load(id);
 				},
+				//load之前已经建立的某个Id
 				load: function(id){
 					if($.isArray(id)){
 						return $.when.apply($, $.map(id, function(val) {
@@ -226,18 +269,15 @@ if( typeof tShu_util === 'undefined' ){
 			}
 		}
 	})();
-	//异步加载css
-	tShu_util.asyncCss = {
-		load: function(id, cssUrl, callback){
-			HdPortal.Res.loadUrl(id, cssUrl).then(callback);
-			return this;
-		}
-	};
 	//加载路由
 	tShu_util.loadRouter = function(routerName){
-		return tShu_util.Res.loadg('fool').then(function(routerData){
-			console.log(routerData);
-			return routerData;
-		});
+		if( !tShu_util.routManage ){
+			tShu_util.routManage = {};
+		}
+		return new Promise(function(resolve,reject){
+			tShu_util.Res.loadg('foo').then(function(routerData){
+				resolve(tShu_util.routManage['foo']);
+			});
+		})
 	}
 })(tShu_util,jQuery)
