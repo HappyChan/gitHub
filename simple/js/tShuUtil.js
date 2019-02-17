@@ -13,7 +13,7 @@ if( typeof tShu_util === 'undefined' ){
 			head = doc.head || doc.getElementsByTagName('head')[0] || doc.documentElement,
 			getErrDeferred = function(type, msg){
 				console.warn('Res_' + type, msg);
-				return $.Deferred().reject(type, msg);
+				return Promise.reject(type, msg);
 			},
 			setConf = function(key, val){
 				$.extend(Res.conf[key] || (Res.conf[key] = {}), $.type(val) == 'string' ? {val: val} : val);
@@ -233,4 +233,11 @@ if( typeof tShu_util === 'undefined' ){
 			return this;
 		}
 	};
-})(tShu_util)
+	//加载路由
+	tShu_util.loadRouter = function(routerName){
+		return tShu_util.Res.loadg('fool').then(function(routerData){
+			console.log(routerData);
+			return routerData;
+		});
+	}
+})(tShu_util,jQuery)

@@ -4,38 +4,35 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <link rel="stylesheet" href="css/elementui.src.css">
+    <link rel="stylesheet" href="css/comm/elementui.src.css">
 	<script src="js/comm/jquery-core.src.js"></script>
 	<script src="js/tShuUtil.js"></script>
     <title>Document</title>
 </head>
 <body>
-	<div id="myApp">
-		<div id="tsHeader"></div>
-		<div class="tsMainBody">
-		    <div class="leftAsigan">
-				<el-menu>
-					<el-submenu>
-						<template>
-							<span>导航一</span>
-						</template>
-						<el-menu-item-group>
-							<el-menu-item></el-menu-item>
-						</el-menu-item-group>
-					</el-submenu>
-				</el-menu>
-			</div>
-		    <div class="rightAsight">
-		        <keep-alive>
-					<router-view></router-view>
-				</keep-alive>
-		    </div>
-		</div>
+	<div id="app">
+		<h1>Hello App!</h1>
+		<p>
+			<!-- 使用 router-link 组件来导航. -->
+			<!-- 通过传入 `to` 属性指定链接. -->
+			<!-- <router-link> 默认会被渲染成一个 `<a>` 标签 -->
+			<router-link to="/foo">Go to Foo</router-link>
+			<router-link to="/bar">Go to Bar</router-link>
+		</p>
+		<!-- 路由出口 -->
+		<!-- 路由匹配到的组件将渲染在这里 -->
+		<router-view></router-view>
 	</div>
 	<script type="text/javascript">
-		
+		tShu_util.Res.setGroup({
+			fool: {
+				js: "tShuRouter/fool.src.js",
+				css: "../css/fool.src.css"
+			}
+		})
 	</script>
-    <script src="js/comm/vue.js"></script>
+	<script src="js/comm/vue.js"></script>
+	<script src="js/fool.src.js"></script>
     <script src="js/comm/vue-router.js"></script>
     <script src="js/comm/elementui.src.js"></script>
 	<script src="js/main.js"></script>
